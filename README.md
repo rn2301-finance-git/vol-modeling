@@ -1,4 +1,4 @@
-# BAM Volatility Prediction Project
+# Volatility Prediction Project
 
 A research project to develop robust models for predicting 10-minute forward volatility, with emphasis on production-ready implementation and infrastructure scalability.
 
