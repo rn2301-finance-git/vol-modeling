@@ -1,0 +1,79 @@
+2025-02-02 14:11:37 - BAM - INFO - Initialized new run: lani_transformer_20250202_1411
+2025-02-02 14:11:37 - BAM - INFO - Local checkpoint directory: /tmp/bam_run_56lhy99o/checkpoints
+2025-02-02 14:11:37 - BAM - INFO - S3 base path: s3://bam-volatility-project/experiments/transformer/vol_wt_05/single_run_of_transformer_141136/lani_transformer_20250202_1411
+2025-02-02 14:11:37 - BAM - INFO - Created new run manager at experiments/transformer/vol_wt_05/single_run_of_transformer_141136
+2025-02-02 14:11:37 - BAM - INFO - Starting experiment: Single run of transformer
+2025-02-02 14:12:06 - BAM - INFO - EpochStep 0: train_loss: 0.000012 | val_loss: -0.000213 | epoch_time: 27.654568 | step: 0
+2025-02-02 14:12:12 - BAM - INFO - Successfully uploaded checkpoint and scalers to S3
+2025-02-02 14:12:39 - BAM - INFO - EpochStep 1: train_loss: nan | val_loss: -0.000483 | epoch_time: 26.831729 | step: 1
+2025-02-02 14:12:46 - BAM - INFO - Successfully uploaded checkpoint and scalers to S3
+2025-02-02 14:13:13 - BAM - INFO - EpochStep 2: train_loss: nan | val_loss: -0.000663 | epoch_time: 26.757175 | step: 2
+2025-02-02 14:13:20 - BAM - INFO - Successfully uploaded checkpoint and scalers to S3
+2025-02-02 14:13:46 - BAM - INFO - EpochStep 3: train_loss: nan | val_loss: -0.000741 | epoch_time: 26.531092 | step: 3
+2025-02-02 14:13:53 - BAM - INFO - Successfully uploaded checkpoint and scalers to S3
+2025-02-02 14:14:20 - BAM - INFO - EpochStep 4: train_loss: nan | val_loss: -0.000798 | epoch_time: 26.998218 | step: 4
+2025-02-02 14:14:27 - BAM - INFO - Successfully uploaded checkpoint and scalers to S3
+2025-02-02 14:14:54 - BAM - INFO - EpochStep 5: train_loss: nan | val_loss: -0.000836 | epoch_time: 26.815860 | step: 5
+2025-02-02 14:15:00 - BAM - INFO - Successfully uploaded checkpoint and scalers to S3
+2025-02-02 14:15:28 - BAM - INFO - EpochStep 6: train_loss: nan | val_loss: -0.000864 | epoch_time: 26.939845 | step: 6
+2025-02-02 14:15:34 - BAM - INFO - Successfully uploaded checkpoint and scalers to S3
+2025-02-02 14:16:01 - BAM - INFO - EpochStep 7: train_loss: nan | val_loss: -0.000877 | epoch_time: 26.734896 | step: 7
+2025-02-02 14:16:07 - BAM - INFO - Successfully uploaded checkpoint and scalers to S3
+2025-02-02 14:16:35 - BAM - INFO - EpochStep 8: train_loss: nan | val_loss: -0.000900 | epoch_time: 26.845767 | step: 8
+2025-02-02 14:16:41 - BAM - INFO - Successfully uploaded checkpoint and scalers to S3
+2025-02-02 14:17:08 - BAM - INFO - EpochStep 9: train_loss: nan | val_loss: -0.000911 | epoch_time: 26.783730 | step: 9
+2025-02-02 14:17:15 - BAM - INFO - Successfully uploaded checkpoint and scalers to S3
+2025-02-02 14:17:42 - BAM - INFO - EpochStep 10: train_loss: nan | val_loss: -0.000922 | epoch_time: 26.859455 | step: 10
+2025-02-02 14:17:48 - BAM - INFO - Successfully uploaded checkpoint and scalers to S3
+2025-02-02 14:18:15 - BAM - INFO - EpochStep 11: train_loss: nan | val_loss: -0.000929 | epoch_time: 26.879696 | step: 11
+2025-02-02 14:18:21 - BAM - INFO - Successfully uploaded checkpoint and scalers to S3
+2025-02-02 14:18:49 - BAM - INFO - EpochStep 12: train_loss: nan | val_loss: -0.000941 | epoch_time: 27.010874 | step: 12
+2025-02-02 14:18:55 - BAM - INFO - Successfully uploaded checkpoint and scalers to S3
+2025-02-02 14:19:22 - BAM - INFO - EpochStep 13: train_loss: nan | val_loss: -0.000951 | epoch_time: 26.719059 | step: 13
+2025-02-02 14:19:29 - BAM - INFO - Successfully uploaded checkpoint and scalers to S3
+2025-02-02 14:19:56 - BAM - INFO - EpochStep 14: train_loss: nan | val_loss: -0.000964 | epoch_time: 26.815427 | step: 14
+2025-02-02 14:20:03 - BAM - INFO - Successfully uploaded checkpoint and scalers to S3
+2025-02-02 14:20:30 - BAM - INFO - EpochStep 15: train_loss: nan | val_loss: -0.000980 | epoch_time: 26.945025 | step: 15
+2025-02-02 14:20:36 - BAM - INFO - Successfully uploaded checkpoint and scalers to S3
+2025-02-02 14:21:04 - BAM - INFO - EpochStep 16: train_loss: nan | val_loss: -0.000996 | epoch_time: 26.920192 | step: 16
+2025-02-02 14:21:10 - BAM - INFO - Successfully uploaded checkpoint and scalers to S3
+2025-02-02 14:21:38 - BAM - INFO - EpochStep 17: train_loss: nan | val_loss: -0.001001 | epoch_time: 26.934480 | step: 17
+2025-02-02 14:21:44 - BAM - INFO - Successfully uploaded checkpoint and scalers to S3
+2025-02-02 14:22:12 - BAM - INFO - EpochStep 18: train_loss: nan | val_loss: -0.001001 | epoch_time: 26.986473 | step: 18
+2025-02-02 14:22:18 - BAM - INFO - Successfully uploaded checkpoint and scalers to S3
+2025-02-02 14:22:45 - BAM - INFO - EpochStep 19: train_loss: nan | val_loss: -0.001002 | epoch_time: 26.909165 | step: 19
+2025-02-02 14:22:51 - BAM - INFO - Successfully uploaded checkpoint and scalers to S3
+2025-02-02 14:23:18 - BAM - INFO - EpochStep 20: train_loss: nan | val_loss: -0.001000 | epoch_time: 26.779506 | step: 20
+2025-02-02 14:23:46 - BAM - INFO - EpochStep 21: train_loss: nan | val_loss: -0.001003 | epoch_time: 27.003811 | step: 21
+2025-02-02 14:23:52 - BAM - INFO - Successfully uploaded checkpoint and scalers to S3
+2025-02-02 14:24:19 - BAM - INFO - EpochStep 22: train_loss: nan | val_loss: -0.001002 | epoch_time: 27.016660 | step: 22
+2025-02-02 14:24:47 - BAM - INFO - EpochStep 23: train_loss: nan | val_loss: -0.001002 | epoch_time: 26.902915 | step: 23
+2025-02-02 14:25:14 - BAM - INFO - EpochStep 24: train_loss: nan | val_loss: -0.001003 | epoch_time: 26.784869 | step: 24
+2025-02-02 14:25:20 - BAM - INFO - Successfully uploaded checkpoint and scalers to S3
+2025-02-02 14:25:48 - BAM - INFO - EpochStep 25: train_loss: nan | val_loss: -0.001004 | epoch_time: 26.903130 | step: 25
+2025-02-02 14:25:54 - BAM - INFO - Successfully uploaded checkpoint and scalers to S3
+2025-02-02 14:26:21 - BAM - INFO - EpochStep 26: train_loss: nan | val_loss: -0.001004 | epoch_time: 26.801527 | step: 26
+2025-02-02 14:26:27 - BAM - INFO - Successfully uploaded checkpoint and scalers to S3
+2025-02-02 14:26:54 - BAM - INFO - EpochStep 27: train_loss: nan | val_loss: -0.001004 | epoch_time: 26.882285 | step: 27
+2025-02-02 14:27:01 - BAM - INFO - Successfully uploaded checkpoint and scalers to S3
+2025-02-02 14:27:28 - BAM - INFO - EpochStep 28: train_loss: nan | val_loss: -0.001003 | epoch_time: 26.966343 | step: 28
+2025-02-02 14:27:55 - BAM - INFO - EpochStep 29: train_loss: nan | val_loss: -0.001004 | epoch_time: 27.012391 | step: 29
+2025-02-02 14:28:23 - BAM - INFO - EpochStep 30: train_loss: nan | val_loss: -0.001004 | epoch_time: 26.764263 | step: 30
+2025-02-02 14:28:50 - BAM - INFO - EpochStep 31: train_loss: nan | val_loss: -0.001003 | epoch_time: 26.786902 | step: 31
+2025-02-02 14:29:17 - BAM - INFO - EpochStep 32: train_loss: nan | val_loss: -0.001003 | epoch_time: 26.838385 | step: 32
+2025-02-02 14:29:45 - BAM - INFO - EpochStep 33: train_loss: nan | val_loss: -0.001004 | epoch_time: 26.950413 | step: 33
+2025-02-02 14:29:51 - BAM - INFO - Successfully uploaded checkpoint and scalers to S3
+2025-02-02 14:30:18 - BAM - INFO - EpochStep 34: train_loss: nan | val_loss: -0.001004 | epoch_time: 26.762101 | step: 34
+2025-02-02 14:30:46 - BAM - INFO - EpochStep 35: train_loss: nan | val_loss: -0.001004 | epoch_time: 27.008003 | step: 35
+2025-02-02 14:31:13 - BAM - INFO - EpochStep 36: train_loss: nan | val_loss: -0.001004 | epoch_time: 26.917166 | step: 36
+2025-02-02 14:31:40 - BAM - INFO - EpochStep 37: train_loss: nan | val_loss: -0.001003 | epoch_time: 26.730676 | step: 37
+2025-02-02 14:32:08 - BAM - INFO - EpochStep 38: train_loss: nan | val_loss: -0.001004 | epoch_time: 27.040850 | step: 38
+2025-02-02 14:32:35 - BAM - INFO - EpochStep 39: train_loss: nan | val_loss: -0.001004 | epoch_time: 26.701053 | step: 39
+2025-02-02 14:33:02 - BAM - INFO - EpochStep 40: train_loss: nan | val_loss: -0.001004 | epoch_time: 26.880467 | step: 40
+2025-02-02 14:33:29 - BAM - INFO - EpochStep 41: train_loss: nan | val_loss: -0.001004 | epoch_time: 27.006804 | step: 41
+2025-02-02 14:33:57 - BAM - INFO - EpochStep 42: train_loss: nan | val_loss: -0.001004 | epoch_time: 27.004978 | step: 42
+2025-02-02 14:34:24 - BAM - INFO - EpochStep 43: train_loss: nan | val_loss: -0.001004 | epoch_time: 26.895633 | step: 43
+2025-02-02 14:34:24 - BAM - INFO - Loaded best model from /tmp/bam_run_56lhy99o/checkpoints/best_model.pt
+2025-02-02 14:34:27 - BAM - INFO - Finished run: Single run of transformer | Aggregated Val RMSE=0.0050 | Aggregated rank_corr=-0.0457
+2025-02-02 14:34:29 - BAM - INFO - Successfully uploaded checkpoint and scalers to S3
+2025-02-02 14:34:30 - BAM - INFO - Saved log file to s3://bam-volatility-project/experiments/transformer/vol_wt_05/single_run_of_transformer_141136/lani_transformer_20250202_1411/logs/run.log

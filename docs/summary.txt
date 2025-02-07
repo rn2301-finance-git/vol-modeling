@@ -1,0 +1,58 @@
+
+The Big Picture
+
+Objective:
+
+I’m building a predictive model for high‑frequency market data that forecasts two key aspects of a stock’s short‑term behavior:
+	1.	Returns Forecast:
+I want my model to predict the stock’s return over the next hour.
+	2.	Volatility Forecast:
+At the same time, it forecasts the stock’s volatility over the next 10 minutes.
+
+Additionally, the model outputs confidence scores for both predictions so I can gauge the reliability of each forecast.
+
+Why I Chose a Transformer
+	•	Adaptive Attention:
+Instead of relying on fixed lookback windows like traditional technical indicators, I’m using a transformer with self‑attention. This allows the model to learn which past market events are most relevant for forecasting returns and volatility.
+	•	Three‑Headed Architecture:
+My transformer model has three separate output heads:
+	•	One for the return forecast,
+	•	One for the volatility forecast, and
+	•	One for producing confidence scores.
+	•	Sequence Input:
+The model takes in a 30‑minute sequence of minutely data. This sequence includes features such as prices, volumes, spreads, microstructure details, and technical indicators. This design lets me capture patterns in short‑term price dynamics, order flow, and volatility regimes.
+
+Data and Feature Engineering
+	•	Data Source:
+I use one year’s worth of minutely Best Bid and Offer (BBO) data for about 1000 top stocks.
+	•	Feature Set:
+Each stock’s data has around 59 features—including price features, volume metrics, volatility measures, microstructure signals, and technical indicators.
+	•	Preprocessing:
+During training, I preprocess the data by computing rolling statistics, handling missing values, and scaling features. I mirror these steps during inference to ensure consistency.
+
+My Inference Workflow
+	1.	Model & Configuration Retrieval:
+I locate a specific training run on S3 using the experiment name, model type, and a unique run‑prefix (for example, “jennifer”). Then I load the corresponding model checkpoint, configuration files (including hyperparameters and feature information), and any saved scalers for data normalization.
+	2.	Data Loading and Preprocessing:
+For each date (or for a specific date if provided), I download the pre‑computed parquet files containing daily market data. I then preprocess this data—handling missing values and scaling features—exactly as I did during training.
+	3.	Sequence Formation & Prediction:
+Since my model expects sequences, I create a sliding‑window dataset (using my ThreeHeadedTransformerDataset) that segments each day’s data into overlapping sequences. I can run the model in two modes:
+	•	Dense Mode: When I specify --dense, I override the sampling interval (i.e. sample_every=1) so that I get a prediction for every minute.
+	•	Sparse Mode: Otherwise, I use a default sampling interval (e.g. every 10 minutes) and then forward‑fill predictions to cover every minute.
+	4.	GPU Acceleration and Parallelism:
+I support GPU acceleration by moving the model to the GPU and using mixed precision with torch.cuda.amp.autocast. In addition, I process multiple dates in parallel using Python’s multiprocessing, which speeds up the overall inference run.
+	5.	Saving the Results:
+After the model generates predictions for volatility, returns, and their confidence scores, I merge these predictions back with the original timestamps. Finally, I save the results as CSV files in an “inference” folder within the run directory on S3.
+
+What My Model Should Be Doing
+	•	Learning Relevant Patterns:
+By leveraging self‑attention, my transformer should learn to focus on specific events or patterns in the past 30‑minute window that are most predictive of near‑term volatility and returns.
+	•	Providing Reliable Forecasts:
+Not only does the model forecast returns and volatility, but it also outputs confidence scores, helping me understand when I can trust the predictions.
+	•	Handling High‑Frequency Data:
+My system is designed to process large volumes of high‑frequency data quickly—thanks to GPU acceleration and parallel processing—so that I can generate minute‑by‑minute predictions for real‑time trading or risk management decisions.
+
+In Summary
+
+I’ve built a sophisticated system where a three‑headed transformer ingests 30 minutes of minutely market data and outputs predictions for future returns and volatility, along with confidence estimates. My pipeline carefully mirrors the training preprocessing steps during inference, leverages self‑attention to dynamically weight past events, and supports both dense (every‑minute) and sparse prediction modes. The entire process—from retrieving checkpoints from S3 to parallel inference across multiple dates—is designed to provide actionable, reliable forecasts for high‑frequency market behavior.
+
