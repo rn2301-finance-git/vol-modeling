@@ -35,7 +35,7 @@ def is_etf(symbol, api_key):
 
 # Example usage
 if __name__ == "__main__":
-    api_key = "db-h5XEUPaDDEKtft7FpwifmPFBu8wB4"
+    api_key = os.environ["DATABENTO_API_KEY"]
     symbol = "SPY"
 
     result, info = is_etf(symbol, api_key)
