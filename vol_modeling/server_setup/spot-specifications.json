@@ -1,0 +1,29 @@
+{
+    "ImageId": "ami-0b31b2157b1dbf287",
+    "InstanceType": "g4dn.xlarge",
+    "KeyName": "ec2_private_key",
+    "SecurityGroupIds": ["sg-0d7c898f76b0ace3f"],
+    "Placement": {
+        "AvailabilityZone": "us-east-2c"
+    },
+    "BlockDeviceMappings": [
+        {
+            "DeviceName": "/dev/xvda",
+            "Ebs": {
+                "VolumeSize": 45,
+                "VolumeType": "gp3",
+                "Iops": 3000,
+                "DeleteOnTermination": true
+            }
+        },
+        {
+            "DeviceName": "/dev/sdf",
+            "Ebs": {
+                "VolumeSize": 100,
+                "VolumeType": "gp3",
+                "Iops": 3000,
+                "DeleteOnTermination": true
+            }
+        }
+    ]
+}
