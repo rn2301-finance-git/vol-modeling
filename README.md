@@ -9,7 +9,7 @@ A research project to develop robust models for predicting 10-minute forward vol
 ├── models/              # Model implementations (XGBoost, Transformer - also MLP and CNN)
 ├── data_pipeline/       # Data preprocessing and feature engineering  
 ├── inference/           # Production inference pipeline
-└── scripts/            # Training and hyperparameter tuning
+└── scripts/            # Shell scripts and other utilities for file transfer etc 
 ```
 
 ## Quick Start
