@@ -32,9 +32,7 @@ python inference/run_inference.py -m transformer -e experiment_name -p run_prefi
 ## Models
 - Three-headed Transformer: Joint prediction of volatility, returns and confidence
 - XGBoost: Baseline model with proven performance
-- Sequence MLP: For capturing temporal patterns
-- Lasso: Linear baseline with feature selection
-
+  
 ## Key Features
 - Asymmetric loss functions prioritizing over-prediction
 - Auto-scaling infrastructure with AWS spot instances
