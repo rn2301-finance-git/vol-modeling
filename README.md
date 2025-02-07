@@ -6,7 +6,7 @@ A research project to develop robust models for predicting 10-minute forward vol
 ```
 .
 ├── evaluation/           # Model evaluation and runtime management
-├── models/              # Model implementations (XGBoost, LSTM, Transformer)
+├── models/              # Model implementations (XGBoost, Transformer - also MLP and CNN)
 ├── data_pipeline/       # Data preprocessing and feature engineering  
 ├── inference/           # Production inference pipeline
 └── scripts/            # Training and hyperparameter tuning
