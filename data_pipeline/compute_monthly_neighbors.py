@@ -10,6 +10,10 @@ from io import StringIO
 import calendar
 import os
 
+BUCKET_NAME = os.environ.get('BUCKET_NAME')
+if not BUCKET_NAME:
+    raise ValueError("Environment variable BUCKET_NAME must be set")
+
 def list_months(start_ym, end_ym):
     """
     Given start_ym='YYYYMM' and end_ym='YYYYMM',
@@ -69,7 +73,7 @@ def main():
     parser = argparse.ArgumentParser(description="Compute nearest neighbors for a month from prior month's log_ret_1m.")
     parser.add_argument("--month", required=True, help="Month in YYYYMM format")
     parser.add_argument("--top_k", type=int, default=5, help="Number of neighbors to compute")
-    parser.add_argument("--bucket", default="bam-volatility-project", help="S3 bucket name")
+    parser.add_argument("--bucket", default=BUCKET_NAME, help="S3 bucket name")
     parser.add_argument("--check", action="store_true", help="Print debug info")
     args = parser.parse_args()
 
@@ -92,7 +96,7 @@ def main():
     print("Listing S3 keys under", prefix_itch, "...")
     all_keys = s3_fs.ls(f"{bucket}/{prefix_itch}")
     # all_keys is a list of dicts or strings, depending on s3fs version. Typically a list of "bucket/prefix/file"
-    # We'll parse out the date from the filename. A typical key might be "bam-volatility-project/data/features/itch/20240116.itch_features.parquet"
+    # We'll parse out the date from the filename. A typical key might be "volatility-project/data/features/itch/20240116.itch_features.parquet"
 
     day_to_key = {}
     for k in all_keys:

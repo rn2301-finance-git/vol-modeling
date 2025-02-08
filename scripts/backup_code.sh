@@ -4,7 +4,7 @@
 timestamp=$(date +%Y%m%d_%H%M%S)
 
 # Create backup directory
-mkdir -p ~/Backups/BAM_backups
+mkdir -p ~/Backups/vol_project_backups
 
 # Create backup using rsync with exclusions
 rsync -av --exclude='.venv' \
@@ -18,16 +18,16 @@ rsync -av --exclude='.venv' \
     --exclude='*.log' \
     --exclude='.idea' \
     --exclude='.vscode' \
-    ~/Code/BAM/ ~/Backups/BAM_backups/BAM_${timestamp}/
+    ~/Code/vol_modeling/ ~/Backups/vol_project_backups/vol_project_${timestamp}/
 
 # Print backup size
-echo "Created backup: BAM_${timestamp}"
+echo "Created backup: vol_project_${timestamp}"
 echo "Backup size:"
-du -sh ~/Backups/BAM_backups/BAM_${timestamp}
+du -sh ~/Backups/vol_project_backups/vol_project_${timestamp}
 
 # Keep only last 5 backups (optional)
-#cd ~/Backups/BAM_backups && ls -t | tail -n +6 | xargs rm -rf 2>/dev/null
+#cd ~/Backups/vol_project_backups && ls -t | tail -n +6 | xargs rm -rf 2>/dev/null
 
 # List remaining backups
 echo -e "\nExisting backups:"
-ls -lh ~/Backups/BAM_backups
+ls -lh ~/Backups/vol_project_backups

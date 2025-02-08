@@ -16,7 +16,6 @@ class DabentoDownloader:
         self.bucket_name = bucket_name
         self.ftp_user = ftp_user
         
-        # Get password from environment variable if not provided
         if ftp_pass is None:
             ftp_pass = os.environ.get('DATABENTO_PASSWORD')
             if not ftp_pass:
@@ -34,22 +33,11 @@ class DabentoDownloader:
             dataset_type (str): Type of data ('ITCH' or 'OHLCV')
             s3_prefix (str, optional): Custom S3 prefix. If None, will be auto-generated
         """
-        # Parse date from request ID (assumes format like 'XNAS-20250115-XXXXX')
-        date_str = request_id.split('-')[1]
-        try:
-            date = datetime.strptime(date_str, '%Y%m%d')
-            date_path = date.strftime('%Y/%m/%d')
-        except ValueError:
-            date_path = "unknown_date"
-
-        # Construct paths
         ftp_path = f"/6RNGNVWH/{request_id}"
         
         if s3_prefix is None:
-            # Auto-generate S3 prefix based on data type and date
-            s3_prefix = f"databento/{dataset_type}/{date_path}/"
+            s3_prefix = f"databento/{dataset_type}/"
 
-        # Initialize transfer
         transfer = FTPtoS3Transfer(
             ftp_host=self.ftp_host,
             ftp_user=self.ftp_user,
@@ -84,7 +72,6 @@ def main():
     parser.add_argument('-p', '--ftp-pass', help='Databento FTP password (or use DATABENTO_PASSWORD env var)')
     parser.add_argument('-s', '--s3-prefix', help='Custom S3 prefix (optional)')
     
-    # Add examples to the help text
     parser.epilog = '''
     Examples:
         # Download ITCH data using environment variable for password

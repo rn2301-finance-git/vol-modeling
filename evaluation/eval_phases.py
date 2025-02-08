@@ -223,7 +223,10 @@ PHASES = {
                 "learning_rate": 0.1,
                 "max_depth": 6,
                 "subsample": 0.8,
-                "colsample_bytree": 0.8
+                "colsample_bytree": 0.8,
+                "reg_alpha": 0.0,
+                "reg_lambda": 1.0,
+                "gamma": 0.0
             }
         ],
         "PHASE2_LR_TEST": [
@@ -233,7 +236,10 @@ PHASES = {
                 "learning_rate": 0.05,
                 "max_depth": 6,
                 "subsample": 0.8,
-                "colsample_bytree": 0.8
+                "colsample_bytree": 0.8,
+                "reg_alpha": 0.0,
+                "reg_lambda": 1.0,
+                "gamma": 0.0
             },
             {
                 "description": "Run 2B: LR=0.01",
@@ -241,17 +247,23 @@ PHASES = {
                 "learning_rate": 0.01,
                 "max_depth": 6,
                 "subsample": 0.8,
-                "colsample_bytree": 0.8
+                "colsample_bytree": 0.8,
+                "reg_alpha": 0.0,
+                "reg_lambda": 1.0,
+                "gamma": 0.0
             }
         ],
         "PHASE3_MAX_DEPTH": [
             {
                 "description": "Run 3A: max_depth=4",
                 "n_estimators": 200,
-                "learning_rate": None,  # Will be set based on best LR from PHASE2
+                "learning_rate": None,  # Inherit best LR from PHASE2
                 "max_depth": 4,
                 "subsample": 0.8,
-                "colsample_bytree": 0.8
+                "colsample_bytree": 0.8,
+                "reg_alpha": None,
+                "reg_lambda": None,
+                "gamma": None
             },
             {
                 "description": "Run 3B: max_depth=8",
@@ -259,35 +271,82 @@ PHASES = {
                 "learning_rate": None,
                 "max_depth": 8,
                 "subsample": 0.8,
-                "colsample_bytree": 0.8
+                "colsample_bytree": 0.8,
+                "reg_alpha": None,
+                "reg_lambda": None,
+                "gamma": None
             }
         ],
-        "PHASE4_SUBSAMPLE": [
+        "PHASE4_REGULARIZATION": [
             {
-                "description": "Run 4A: subsample=0.6",
+                "description": "Run 4A: L1 Regularization",
+                "n_estimators": 200,
+                "learning_rate": None,
+                "max_depth": None,
+                "subsample": None,
+                "colsample_bytree": None,
+                "reg_alpha": 0.1,
+                "reg_lambda": None,
+                "gamma": None
+            },
+            {
+                "description": "Run 4B: L2 Regularization",
+                "n_estimators": 200,
+                "learning_rate": None,
+                "max_depth": None,
+                "subsample": None,
+                "colsample_bytree": None,
+                "reg_alpha": None,
+                "reg_lambda": 1.5,
+                "gamma": None
+            },
+            {
+                "description": "Run 4C: Increase Gamma",
+                "n_estimators": 200,
+                "learning_rate": None,
+                "max_depth": None,
+                "subsample": None,
+                "colsample_bytree": None,
+                "reg_alpha": None,
+                "reg_lambda": None,
+                "gamma": 0.1
+            }
+        ],
+        "PHASE5_SUBSAMPLE": [
+            {
+                "description": "Run 5A: subsample=0.6",
                 "n_estimators": 200,
                 "learning_rate": None,
                 "max_depth": None,
                 "subsample": 0.6,
-                "colsample_bytree": 0.8
+                "colsample_bytree": 0.8,
+                "reg_alpha": None,
+                "reg_lambda": None,
+                "gamma": None
             },
             {
-                "description": "Run 4B: subsample=1.0",
+                "description": "Run 5B: subsample=1.0",
                 "n_estimators": 200,
                 "learning_rate": None,
                 "max_depth": None,
                 "subsample": 1.0,
-                "colsample_bytree": 0.8
+                "colsample_bytree": 0.8,
+                "reg_alpha": None,
+                "reg_lambda": None,
+                "gamma": None
             }
         ],
-        "PHASE5_FINAL": [
+        "PHASE6_FINAL": [
             {
-                "description": "Run 5: Final best XGB config",
+                "description": "Run 6: Final Best XGB Config",
                 "n_estimators": None,
                 "learning_rate": None,
                 "max_depth": None,
                 "subsample": None,
-                "colsample_bytree": 0.8
+                "colsample_bytree": 0.8,
+                "reg_alpha": None,
+                "reg_lambda": None,
+                "gamma": None
             }
         ]
     },

@@ -3,12 +3,12 @@ import os
 import json
 
 # Add the project root to Python path - handle both possible locations
-if os.path.exists("/workspace/BAM"):
-    sys.path.append("/workspace/BAM")
-elif os.path.exists("/ml_data/BAM"):
-    sys.path.append("/ml_data/BAM")
+if os.path.exists("/workspace/vol_modeling"):
+    sys.path.append("/workspace/vol_modeling")
+elif os.path.exists("/ml_data/vol_project"):
+    sys.path.append("/ml_data/vol_project")
 else:
-    raise RuntimeError("Could not find BAM project directory in expected locations")
+    raise RuntimeError("Could not find vol_project project directory in expected locations")
 
 import torch
 import logging

@@ -8,12 +8,18 @@ import pyarrow.parquet as pq
 import argparse
 from feature_engineering import get_dates_from_s3
 import warnings
+import os
+
+BUCKET_NAME = os.environ.get('BUCKET_NAME')
+if not BUCKET_NAME:
+    raise ValueError("Environment variable BUCKET_NAME must be set")
+
 warnings.filterwarnings('ignore', category=DeprecationWarning, 
                        message='datetime.datetime.utcnow.*is deprecated')
 
 def merge_vol_data(
     date_str,
-    s3_bucket='bam-volatility-project',
+    s3_bucket=BUCKET_NAME,
     intraday_prefix='data/features/itch/',
     lookback_prefix='data/features/intraday_volatility/',
     neighbors_prefix='data/features/nn/',
@@ -377,7 +383,7 @@ def process_date_range(start_date, end_date, overwrite=False, **kwargs):
     from datetime import datetime
 
     all_dates = get_dates_from_s3(
-        kwargs.get('s3_bucket', 'bam-volatility-project'),
+        kwargs.get('s3_bucket', 'volatility-project'),
         kwargs.get('intraday_prefix', 'data/features/itch/')
     )
     
@@ -397,7 +403,7 @@ def process_date_range(start_date, end_date, overwrite=False, **kwargs):
     print(f"\nProcessing {len(dates_to_process)} dates from {dates_to_process[0]} to {dates_to_process[-1]}")
     
     fs = s3fs.S3FileSystem(anon=False)
-    s3_bucket = kwargs.get('s3_bucket', 'bam-volatility-project')
+    s3_bucket = kwargs.get('s3_bucket', 'volatility-project')
     output_prefix = kwargs.get('output_prefix', 'data/features/attention_df/all')
     
     for date in dates_to_process:

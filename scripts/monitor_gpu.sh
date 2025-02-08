@@ -1,6 +1,6 @@
 #!/bin/bash
 
-CONFIG_DIR="$HOME/.bam_config"
+CONFIG_DIR="$HOME/.vol_project_config"
 INSTANCES_FILE="$CONFIG_DIR/instances.json"
 
 if [ "$#" -lt 1 ]; then

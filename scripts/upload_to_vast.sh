@@ -3,7 +3,7 @@
 # Check if arguments are provided
 if [ $# -ne 1 ]; then
     echo "Usage: $0 <instance-alias>"
-    echo "Will sync /Users/raghuvar/Code/BAM/ to the instance's configured remote directory/BAM"
+    echo "Will sync /Users/raghuvar/Code/vol_modeling/ to the instance's configured remote directory/vol_project"
     exit 1
 fi
 
@@ -12,7 +12,7 @@ source "$(dirname "$0")/aliases.sh"
 
 # Arguments
 INSTANCE_ALIAS=$1
-LOCAL_PATH="/Users/raghuvar/Code/BAM/"
+LOCAL_PATH="/Users/raghuvar/Code/vol_modeling/"
 
 # Get instance details
 INSTANCE_DETAILS=$(get_instance_details "$INSTANCE_ALIAS")
@@ -28,7 +28,7 @@ VAST_IP=$(echo "$INSTANCE_DETAILS" | jq -r '.host')
 VAST_PORT=$(echo "$INSTANCE_DETAILS" | jq -r '.port')
 VAST_USER=$(echo "$INSTANCE_DETAILS" | jq -r '.user')
 VAST_KEY=$(echo "$INSTANCE_DETAILS" | jq -r '.auth_file')
-REMOTE_PATH=$(echo "$INSTANCE_DETAILS" | jq -r '.remote_dir')/BAM
+REMOTE_PATH=$(echo "$INSTANCE_DETAILS" | jq -r '.remote_dir')/vol_modeling
 
 # Rsync command
 echo "Uploading $LOCAL_PATH to $VAST_USER@$VAST_IP:$REMOTE_PATH ..."

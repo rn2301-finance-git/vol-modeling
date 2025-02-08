@@ -4,7 +4,7 @@
 set -e
 
 # Directory setup
-CONFIG_DIR="$HOME/.bam_config"
+CONFIG_DIR="$HOME/.vol_project_config"
 INSTANCES_FILE="$CONFIG_DIR/instances.json"
 PROJECT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 SCRIPTS_DIR="$PROJECT_DIR/scripts"
@@ -31,7 +31,7 @@ AUTH_TYPE=$(echo "$INSTANCE_INFO" | jq -r '.auth_type')
 AUTH_FILE=$(echo "$INSTANCE_INFO" | jq -r '.auth_file')
 AUTH_FILE=$(eval echo "$AUTH_FILE")  # Expand ~ if present
 BASE_REMOTE_DIR=$(echo "$INSTANCE_INFO" | jq -r '.remote_dir')
-REMOTE_DIR="${BASE_REMOTE_DIR}/BAM"
+REMOTE_DIR="${BASE_REMOTE_DIR}/vol_project"
 
 echo "Deploying to instance at $HOST (directory: $REMOTE_DIR)"
 
@@ -49,7 +49,7 @@ echo "Creating backup..."
 "$SCRIPTS_DIR/backup_code.sh"
 
 # Get latest backup
-LATEST_BACKUP=$(ls -t "$HOME/BAM_backups" | head -n 1)
+LATEST_BACKUP=$(ls -t "$HOME/vol_project_backups" | head -n 1)
 echo "Using backup: $LATEST_BACKUP"
 
 # Ensure the remote directory exists
@@ -62,7 +62,7 @@ eval "rsync -avz --delete $RSYNC_AUTH \
     --exclude='__pycache__' \
     --exclude='.ipynb_checkpoints' \
     --exclude='requirements.txt' \
-    \"$HOME/BAM_backups/$LATEST_BACKUP/\" \
+    \"$HOME/vol_project_backups/$LATEST_BACKUP/\" \
     \"$USER@$HOST:$REMOTE_DIR/\""
 
 # Copy the setup script

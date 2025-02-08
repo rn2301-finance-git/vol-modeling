@@ -2,7 +2,7 @@ import boto3
 import re
 
 # S3 bucket and prefix
-bucket_name = "bam-volatility-project"
+bucket_name = "volatility-project"
 prefix = "data/daily_turnover/"
 
 def get_dates_from_s3(bucket_name, prefix):

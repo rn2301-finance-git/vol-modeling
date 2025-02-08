@@ -11,6 +11,11 @@ from evaluation.run_manager import RunManager
 import logging
 from scipy import stats
 import scipy.stats
+import os
+
+BUCKET_NAME = os.environ.get('BUCKET_NAME')
+if not BUCKET_NAME:
+    raise ValueError("Environment variable BUCKET_NAME must be set")
 
 class ModelEvaluator:
     """Evaluator that can handle both regular and sequence-based models."""
@@ -29,7 +34,7 @@ class ModelEvaluator:
         self.under_penalty = under_penalty
         self.run_manager = run_manager
         self.results_log = []
-        self.s3_bucket = "bam-volatility-project"
+        self.s3_bucket = BUCKET_NAME
         self.fs = s3fs.S3FileSystem(anon=False)
         
         # Setup logging

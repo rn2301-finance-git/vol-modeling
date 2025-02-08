@@ -14,6 +14,7 @@ import pyarrow as pa
 import pandas_market_calendars as mcal
 from data_pipeline.sequence_dataset import ThreeHeadedTransformerDataset
 from evaluation.run_manager import setup_logging
+import os
 
 # Define dataset splits
 SPLITS = {
@@ -31,6 +32,11 @@ TEST_SPLITS = {
 
 # Get logger for this module
 logger = setup_logging().getChild('preprocessing')
+
+# Add after imports
+BUCKET_NAME = os.environ.get('BUCKET_NAME')
+if not BUCKET_NAME:
+    raise ValueError("Environment variable BUCKET_NAME must be set")
 
 def handle_missing_values(df: pd.DataFrame, feature_cols: List[str], model_type: str = None) -> pd.DataFrame:
     """
@@ -520,7 +526,7 @@ def load_parquet_data(
     
     # Prepare file information
     logger.info("Preparing file information...")
-    base_path = "s3://bam-volatility-project/data/features/attention_df/"
+    base_path = f"s3://{BUCKET_NAME}/data/features/attention_df/"
     input_path = base_path + ("all/" if mode == "full" else "top_n/")
     
     file_infos = []

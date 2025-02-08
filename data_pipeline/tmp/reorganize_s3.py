@@ -64,7 +64,7 @@ def reorganize_s3_paths(bucket_name, old_prefix, new_prefix):
 
 if __name__ == "__main__":
     # Configuration
-    BUCKET_NAME = "bam-volatility-project"
+    BUCKET_NAME = "volatility-project"
     OLD_PREFIX = "raw_data/XNAS/2025-01-15"
     NEW_PREFIX = "databento/ITCH/2025/01/15"
     

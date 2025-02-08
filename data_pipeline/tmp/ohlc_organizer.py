@@ -63,5 +63,5 @@ def organize_ohlc_data(bucket_name):
     print("\nWould you like to proceed with organization? (y/n)")
 
 if __name__ == "__main__":
-    BUCKET_NAME = "bam-volatility-project"
+    BUCKET_NAME = "volatility-project"
     organize_ohlc_data(BUCKET_NAME)

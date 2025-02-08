@@ -24,9 +24,13 @@ est = pytz.timezone('US/Eastern')
 # HELPER FUNCTIONS
 # --------------------------------------------------------
 
+BUCKET_NAME = os.environ.get('BUCKET_NAME')
+if not BUCKET_NAME:
+    raise ValueError("Environment variable BUCKET_NAME must be set")
+
 def get_dates_from_s3(bucket_name, prefix):
     """
-    Scan the specified S3 bucket+prefix for turnover files of the form YYYYMMDD_turnover.csv,
+    Scan the specified S3 bucket+prefix for turnover files of the form YYYYMMDD.turnover.csv,
     and return a sorted list of YYYYMMDD date strings.
     """
     print(f"Gathering dates from s3://{bucket_name}/{prefix} ...")
@@ -51,14 +55,14 @@ def get_dates_from_s3(bucket_name, prefix):
 
 def parquet_exists_in_s3(bucket_name, date_str):
     """
-    Check if the parquet file for a given date already exists in:
-       s3://bucket_name/data/features/itch/{date_str}.itch_features.parquet
+    Check if we already have a parquet file at:
+        s3://bucket_name/data/features/itch/{date_str}.itch_features.parquet
     Return True/False accordingly.
     """
     s3_key = f"data/features/itch/{date_str}.itch_features.parquet"
     s3 = boto3.client('s3')
     try:
-        s3.head_object(Bucket=bucket_name, Key=s3_key)
+        s3.head_object(Bucket=BUCKET_NAME, Key=s3_key)
         return True  # file exists
     except botocore.exceptions.ClientError as e:
         if e.response['Error']['Code'] == '404':
@@ -77,27 +81,26 @@ def load_and_merge_data(dt: str) -> pd.DataFrame:
     """
     print(f"Loading data from S3 (Databento ITCH) for {dt}...")
     s3 = boto3.client("s3")
-    bucket_name = "bam-volatility-project"
 
     # 1) Load the ITCH data from S3
-    dbn_key = f"databento/ITCH/2025/01/15/xnas-itch-{dt}.bbo-1m.dbn.zst"
+    dbn_key = f"databento/ITCH/data/xnas-itch-{dt}.bbo-1m.dbn.zst"
     try:
-        dbn_obj = s3.get_object(Bucket=bucket_name, Key=dbn_key)
+        dbn_obj = s3.get_object(Bucket=BUCKET_NAME, Key=dbn_key)
     except s3.exceptions.NoSuchKey:
         raise FileNotFoundError(
-            f"ITCH data file not found in S3: s3://{bucket_name}/{dbn_key}\n"
+            f"ITCH data file not found in S3: s3://{BUCKET_NAME}/{dbn_key}\n"
             f"Please ensure the Databento ITCH file exists for date {dt}"
         )
 
     dbn_data = BytesIO(dbn_obj["Body"].read())  # in-memory bytes
 
     # 2) Load the daily turnover file from S3
-    turnover_key = f"data/daily_turnover/{dt}_turnover.csv"
+    turnover_key = f"data/daily_turnover/{dt}.turnover.csv"
     try:
-        turnover_obj = s3.get_object(Bucket=bucket_name, Key=turnover_key)
+        turnover_obj = s3.get_object(Bucket=BUCKET_NAME, Key=turnover_key)
     except s3.exceptions.NoSuchKey:
         raise FileNotFoundError(
-            f"Turnover data file not found in S3: s3://{bucket_name}/{turnover_key}\n"
+            f"Turnover data file not found in S3: s3://{BUCKET_NAME}/{turnover_key}\n"
             f"Please ensure the daily turnover file exists for date {dt}"
         )
 
@@ -306,7 +309,7 @@ def engineer_features(df: pd.DataFrame) -> pd.DataFrame:
         # Rolling volatility of volatility
         df[f'vol_of_vol_{window}m'] = (
             df.groupby('symbol')[f'roll_vol_{window}m']
-              .rolling(window, min_periods=window)
+              .rolling(window, min_periods=window//4)
               .std()
               .reset_index(level=0, drop=True)
         )
@@ -443,12 +446,21 @@ def print_sanity_check(df: pd.DataFrame):
     memory_usage = df.memory_usage(deep=True).sum() / 1024**2
     print(f"Total memory: {memory_usage:.2f} MB")
 
-    print("\nMissing values:")
+    print("\nMissing values (sorted by percentage):")
+    total_rows = len(df)
     missing = df.isnull().sum()
-    if missing.any():
-        print(missing[missing > 0])
+    missing_pct = (missing / total_rows * 100).round(2)
+    missing_stats = pd.DataFrame({
+        'Missing Count': missing,
+        'Missing Percentage': missing_pct
+    }).sort_values('Missing Percentage', ascending=False)
+    
+    # Only show columns that have missing values
+    missing_stats = missing_stats[missing_stats['Missing Count'] > 0]
+    if not missing_stats.empty:
+        print(missing_stats)
     else:
-        print("No missing values found")
+        print("No missing values found in any column")
 
     print("\nValue ranges for key columns:")
     numeric_cols = ['mid', 'spread', 'imbalance', 'log_turnover']
@@ -521,12 +533,11 @@ def process_single_date(dt: str, check: bool = False):
     
     # Upload to S3
     s3 = boto3.client("s3")
-    bucket_name = "bam-volatility-project"
     s3_key = f"data/features/itch/{dt}.itch_features.parquet"
     
     try:
-        s3.upload_file(temp_file, bucket_name, s3_key)
-        print(f"Successfully uploaded to s3://{bucket_name}/{s3_key}")
+        s3.upload_file(temp_file, BUCKET_NAME, s3_key)
+        print(f"Successfully uploaded to s3://{BUCKET_NAME}/{s3_key}")
     except Exception as e:
         print(f"Error uploading to S3: {str(e)}")
         raise
@@ -569,14 +580,14 @@ def main():
         except ValueError:
             raise ValueError("Incorrect date format. Please use YYYYMMDD format (e.g., 20250115)")
         
-        bucket_name = "bam-volatility-project"
+
         s3_key = f"data/features/itch/{args.date}.itch_features.parquet"
         
-        if not parquet_exists_in_s3(bucket_name, args.date):
-            print(f"Error: File not found: s3://{bucket_name}/{s3_key}")
+        if not parquet_exists_in_s3(BUCKET_NAME, args.date):
+            print(f"Error: File not found: s3://{BUCKET_NAME}/{s3_key}")
             sys.exit(1)
             
-        print(f"Loading existing file from s3://{bucket_name}/{s3_key} for sanity check...")
+        print(f"Loading existing file from s3://{BUCKET_NAME}/{s3_key} for sanity check...")
         s3 = boto3.client('s3')
         
         try:
@@ -586,7 +597,7 @@ def main():
             temp_file = f"{temp_dir}/{args.date}_check.parquet"
             
             # Download the file
-            s3.download_file(bucket_name, s3_key, temp_file)
+            s3.download_file(BUCKET_NAME, s3_key, temp_file)
             
             # Read and perform sanity check
             df = pd.read_parquet(temp_file)
@@ -625,13 +636,12 @@ def main():
     else:
         # --all mode
         print("Processing ALL dates from S3 daily_turnover.")
-        bucket_name = "bam-volatility-project"
         prefix = "data/daily_turnover/"
 
-        all_dates = get_dates_from_s3(bucket_name, prefix)
+        all_dates = get_dates_from_s3(BUCKET_NAME, prefix)
         for dt in all_dates:
-            if parquet_exists_in_s3(bucket_name, dt):
-                print(f"Already have s3://{bucket_name}/data/features/itch/{dt}.itch_features.parquet ... Skipping.")
+            if parquet_exists_in_s3(BUCKET_NAME, dt):
+                print(f"Already have s3://{BUCKET_NAME}/data/features/itch/{dt}.itch_features.parquet ... Skipping.")
             else:
                 print(f"No parquet found for {dt}. Generating now...")
                 try:

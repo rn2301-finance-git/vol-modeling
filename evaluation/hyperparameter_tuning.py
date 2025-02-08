@@ -17,12 +17,12 @@ import json
 import pathlib
 
 # Add the project root to Python path - handle both possible locations
-if os.path.exists("/workspace/BAM"):
-    sys.path.append("/workspace/BAM")
-elif os.path.exists("/ml_data/BAM"):
-    sys.path.append("/ml_data/BAM")
+if os.path.exists("/workspace/vol_modeling"):
+    sys.path.append("/workspace/vol_modeling")
+elif os.path.exists("/ml_data/vol_project"):
+    sys.path.append("/ml_data/vol_project")
 else:
-    raise RuntimeError("Could not find BAM project directory in expected locations")
+    raise RuntimeError("Could not find vol_project project directory in expected locations")
 
 from sklearn.discriminant_analysis import StandardScaler
 import torch
@@ -51,11 +51,10 @@ from models.deep_learning_model import train_mlp_model, evaluate_mlp_model, get_
 # Add import for Lasso model functions
 from models.lasso_model import train_lasso_model, evaluate_lasso_model
 
-from evaluation.eval_phases import TEMP_PHASES
+from evaluation.eval_phases import PHASES
 # --------------------------------------------------------------------
 # 1) Define your experiment plan (PHASES) — now includes XGBOOST
 # --------------------------------------------------------------------
-PHASES = TEMP_PHASES #just for testing
 
 def parse_phase_key(phase_key: str) -> tuple:
     """
@@ -74,18 +73,31 @@ def parse_phase_key(phase_key: str) -> tuple:
     label = parts[1] if len(parts) > 1 else ""
     return (phase_num, label)
 
-def validate_model_type(model_type, phases):
-    """Validate and normalize model type."""
-    # Create case-insensitive mapping of model types
+def validate_model_type(model_type: str, phases: Dict) -> str:
+    """
+    Validate that the model type exists in phases and return the correct casing.
+    
+    Args:
+        model_type: The model type to validate (case insensitive)
+        phases: Dictionary of phase configurations
+    
+    Returns:
+        The model type with correct casing from phases
+    
+    Raises:
+        ValueError: If model type not found in phases
+    """
+    # Create case-insensitive mapping
     model_map = {k.lower(): k for k in phases.keys()}
     
-    # Look up using lowercase version
-    model_type_lower = model_type.lower()
-    if model_type_lower not in model_map:
-        raise ValueError(f"Model type {model_type} not found in phases. Available types: {list(phases.keys())}")
+    if model_type.lower() not in model_map:
+        raise ValueError(
+            f"Model type {model_type} not found in phases. "
+            f"Available types: {list(phases.keys())}"
+        )
     
-    # Return the correct case version from phases
-    return model_map[model_type_lower]
+    # Return the correctly-cased version
+    return model_map[model_type.lower()]
 
 def update_final_phase_config(phases, phase_results):
     """Update PHASE5_FINAL with best parameters from previous phases."""
@@ -124,7 +136,7 @@ def main(
     subsample_fraction: Optional[float] = None,
     asymmetric_loss: bool = False,
     target: str = "vol",
-    use_lagged_targets: bool = False
+    use_non_lagged_targets: bool = False
 ):
     # Generate structured experiment name
     if experiment_name is None:
@@ -136,7 +148,7 @@ def main(
         experiment_name += "_debug"
     if asymmetric_loss:
         experiment_name += "_asymmetric"
-    if not use_lagged_targets:
+    if use_non_lagged_targets:
         experiment_name += "_nolags"
     
     logger.info(f"Starting experiment: {experiment_name}")
@@ -167,7 +179,7 @@ def main(
             sequence_params=sequence_params,
             subsample_fraction=subsample_fraction,
             debug=debug,  # This ensures TEST_SPLITS is used when debug=True
-            use_lagged_targets=use_lagged_targets  # Add this parameter
+            use_lagged_targets=not use_non_lagged_targets  # Inverted the boolean
         )
 
         # Initialize evaluator
@@ -219,7 +231,7 @@ def main(
                     asymmetric_loss=asymmetric_loss,
                     target=target,
                     feature_scaler=feature_scaler,
-                    use_lagged_targets=use_lagged_targets
+                    use_lagged_targets=not use_non_lagged_targets
                 )
                 
                 # Store config with result for parameter inheritance
@@ -615,8 +627,8 @@ if __name__ == "__main__":
     parser.add_argument('-g', '--target', type=str, default="vol",
                        choices=['vol', 'ret'],
                        help='Target to predict (volatility or returns, default: vol)')
-    parser.add_argument('-l', '--use-lagged-targets', action='store_true',
-                       help='Use lagged targets instead of standard targets')
+    parser.add_argument('-n', '--use-non-lagged-targets', action='store_true',
+                       help='Use non-lagged targets instead of lagged targets (default: False)')
     
     args = parser.parse_args()
     
@@ -644,7 +656,7 @@ if __name__ == "__main__":
                 subsample_fraction=args.subsample_fraction,
                 asymmetric_loss=args.asymmetric_loss,
                 target=args.target,
-                use_lagged_targets=args.use_lagged_targets
+                use_non_lagged_targets=args.use_non_lagged_targets
             )
         except Exception as e:
             logger.error("Fatal error in main execution", exc_info=True)

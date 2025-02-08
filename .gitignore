@@ -22,6 +22,8 @@ wheels/
 
 # Jupyter Notebook
 .ipynb_checkpoints
+notebooks/
+*.ipynb
 
 # Environment
 .env
@@ -36,6 +38,16 @@ ENV/
 *.swp
 *.swo
 
+# Documentation
+docs/_build/
+docs/api/
+site/
+_site/
+.jekyll-cache/
+.docusaurus/
+.cache/
+.sphinx/
+
 # Project specific
 experiments/
 logs/
@@ -46,4 +58,11 @@ data/
 *.pkl
 *.pt
 *.pth
-*.log 
+*.log
+
+# Temporary and backup files
+*~
+*.bak
+*.tmp
+.DS_Store
+Thumbs.db 

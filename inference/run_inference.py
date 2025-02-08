@@ -38,13 +38,18 @@ from models.three_headed_transformer import predict_three_headed_model
 from data_pipeline.sequence_dataset import ThreeHeadedTransformerDataset
 from inference.keep_cols import KEEP_COLUMNS
 
+# Add after imports
+BUCKET_NAME = os.environ.get('BUCKET_NAME')
+if not BUCKET_NAME:
+    raise ValueError("Environment variable BUCKET_NAME must be set")
+
 ###############################################################################
 # Utility to set up logging
 ###############################################################################
 def setup_inference_logging():
     """Configure logging specifically for inference."""
     # Get logger
-    logger = logging.getLogger('BAM')
+    logger = logging.getLogger('vol_project')
     
     # If logger already has handlers, remove them to avoid duplicate logging
     if logger.handlers:
@@ -115,7 +120,7 @@ def parse_arguments():
                         choices=["xgboost", "mlp", "lasso", "seq_mlp", "transformer"],
                         help="Which model to run inference with.")
     parser.add_argument("-e", "--experiment-name", type=str, required=True,
-                        help="Name of the experiment folder (e.g. 'top10') under s3://bam-volatility-project/experiments/<model_type>/")
+                        help="Name of the experiment folder (e.g. 'top10') under s3://volatility-project/experiments/<model_type>/")
     parser.add_argument("-p", "--run-prefix", type=str, required=True,
                         help="Prefix of the run folder to use (e.g. 'jennifer'). Assumed to be unique within the experiment.")
     parser.add_argument("-d", "--date", type=str, default=None,
@@ -134,14 +139,14 @@ def parse_arguments():
 ###############################################################################
 def find_checkpoint_with_run_prefix(model_type: str, experiment_name: str, run_prefix: str) -> str:
     fs = s3fs.S3FileSystem(anon=False)
-    # Construct the base experiment folder path
-    base_dir = f"bam-volatility-project/experiments/{model_type}/{experiment_name}"
+    # Construct the base experiment folder path using BUCKET_NAME
+    base_dir = f"{BUCKET_NAME}/experiments/{model_type}/{experiment_name}"
     if not fs.exists(base_dir):
         raise FileNotFoundError(f"S3 path s3://{base_dir} does not exist.")
     
-    # List all run folders under the base experiment directory.
+    # List all run folders under the base experiment directory
     all_runs = fs.ls(base_dir)
-    # Filter for the folder that starts with the given run_prefix.
+    # Filter for the folder that starts with the given run_prefix
     matching_runs = [run for run in all_runs if os.path.basename(run).startswith(run_prefix)]
     if len(matching_runs) == 0:
         raise ValueError(f"No run folder found with prefix '{run_prefix}' under s3://{base_dir}")
@@ -401,7 +406,7 @@ def get_dates_to_infer(single_date: Optional[str] = None):
 ###############################################################################
 def load_parquet_for_inference(date_str: str) -> pd.DataFrame:
     fs = s3fs.S3FileSystem(anon=False)
-    file_path = f"bam-volatility-project/data/features/attention_df/all/{date_str}.parquet"
+    file_path = f"volatility-project/data/features/attention_df/all/{date_str}.parquet"
     
     if not fs.exists(file_path):
         logger.warning(f"File not found: s3://{file_path}")
@@ -810,7 +815,7 @@ def process_single_date(args_tuple):
      feature_scaler, target_scaler, dense, run_folder, experiment_name, no_overwrite) = args_tuple
     
     # Use a single logger without re-initializing
-    logger = logging.getLogger('BAM.inference')
+    logger = logging.getLogger('vol_project.inference')
     
     # Check if inference files already exist
     fs = s3fs.S3FileSystem(anon=False)

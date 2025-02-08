@@ -15,7 +15,7 @@ import io
 def setup_logging(test_mode: bool = False, log_dir: str = None) -> logging.Logger:
     """Configure logging specifically for inference."""
     # Get logger
-    logger = logging.getLogger('BAM')
+    logger = logging.getLogger('vol_project')
     
     # If logger already has handlers, remove them to avoid duplicate logging
     if logger.handlers:
@@ -48,7 +48,7 @@ def setup_logging(test_mode: bool = False, log_dir: str = None) -> logging.Logge
         # Main log file - use 'test' or 'prod' based on test_mode
         mode_str = 'test' if test_mode else 'prod'
         file_handler = logging.FileHandler(
-            os.path.join(log_dir, f'bam_{mode_str}_{timestamp}.log')
+            os.path.join(log_dir, f'vol_project_{mode_str}_{timestamp}.log')
         )
         file_handler.setLevel(logging.INFO)
         file_handler.setFormatter(file_formatter)
@@ -72,7 +72,7 @@ class RunManager:
     def __init__(self, 
                  model_type: str,
                  mode: str,
-                 s3_bucket: str = "bam-volatility-project",
+                 s3_bucket: str = None,
                  base_path: str = "experiments",
                  experiment_name: Optional[str] = None):
         """
@@ -84,8 +84,8 @@ class RunManager:
             Type of model being trained (e.g., 'mlp', 'seq_mlp')
         mode : str
             Training mode ('full' or 'subset')
-        s3_bucket : str
-            S3 bucket for storing run data
+        s3_bucket : str, optional
+            S3 bucket for storing run data. If None, uses BUCKET_NAME from environment
         base_path : str
             Base path within the bucket for storing experiments
         experiment_name : str, optional
@@ -93,7 +93,7 @@ class RunManager:
         """
         self.model_type = model_type
         self.mode = mode
-        self.s3_bucket = s3_bucket
+        self.s3_bucket = s3_bucket or os.environ['BUCKET_NAME']
         self.experiment_name = experiment_name or model_type
         
         # Standardize the path structure
@@ -102,7 +102,7 @@ class RunManager:
         
         # Create a consistent path structure:
         # s3://bucket/base_path/experiment_name/run_id/
-        self.run_dir = f"s3://{s3_bucket}/{self.base_path}/{self.experiment_name}/{self.run_id}"
+        self.run_dir = f"s3://{self.s3_bucket}/{self.base_path}/{self.experiment_name}/{self.run_id}"
         
         # Initialize S3 filesystem
         self.fs = s3fs.S3FileSystem(anon=False)

@@ -1,7 +1,7 @@
 # aliases.sh
 #!/bin/bash
 
-CONFIG_DIR="$HOME/.bam_config"
+CONFIG_DIR="$HOME/.vol_project_config"
 INSTANCES_FILE="$CONFIG_DIR/instances.json"
 
 # Create config directory and JSON file if they don't exist
@@ -86,6 +86,6 @@ case "$1" in
         ;;
     *)
         echo "Usage: $0 {list|add|remove}"
-        echo "Manages cloud instance aliases for BAM project"
+        echo "Manages cloud instance aliases for vol_project project"
         ;;
 esac

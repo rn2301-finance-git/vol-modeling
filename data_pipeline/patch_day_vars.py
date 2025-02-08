@@ -76,7 +76,7 @@ def add_daily_features(df: pd.DataFrame, short_window: int = 20, long_window: in
     return df[final_cols]
 
 def process_single_date(date_str: str, 
-                        s3_bucket: str = 'bam-volatility-project',
+                        s3_bucket: str = 'volatility-project',
                         input_prefix: str = 'data/features/attention_df/all/',
                         output_prefix: str = 'data/features/attention_df/all/',
                         short_window: int = 5,
@@ -129,7 +129,7 @@ def main():
     parser = argparse.ArgumentParser(description='Patch daily variables in parquet files.')
     parser.add_argument('-s', '--start-date', required=True, help='Start date (YYYYMMDD)')
     parser.add_argument('-e', '--end-date', required=True, help='End date (YYYYMMDD)')
-    parser.add_argument('-b', '--bucket', default='bam-volatility-project', help='S3 bucket name')
+    parser.add_argument('-b', '--bucket', default='volatility-project', help='S3 bucket name')
     parser.add_argument('-i', '--input-prefix', default='data/features/attention_df/all/',
                         help='Input S3 prefix')
     parser.add_argument('-o', '--output-prefix', default='data/features/attention_df/all/',

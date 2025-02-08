@@ -7,7 +7,7 @@ from pathlib import Path
 import pyperclip  # Add this import at the top with other imports
 
 # Configuration
-OUTPUT_DIRECTORY = Path("/Users/raghuvar/Code/bam_tmp/")  # <-- Change this to your desired output directory
+OUTPUT_DIRECTORY = Path("/Users/raghuvar/Code/vol_modeling_tmp/")  # <-- Change this to your desired output directory
 
 def generate_random_string(length=8):
     """Generate a random alphanumeric string."""

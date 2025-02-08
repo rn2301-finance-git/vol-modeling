@@ -4,8 +4,8 @@
 if [ $# -ne 3 ]; then
     echo "Usage: $0 <instance-alias> <remote-path> <local-path>"
     echo "Examples:"
-    echo "  $0 vast1 /workspace/BAM/logs/training.log ./logs/    # Download single file"
-    echo "  $0 vast1 /workspace/BAM/models/best.pth ./models/    # Download model checkpoint"
+    echo "  $0 vast1 /workspace/vol_modeling/logs/training.log ./logs/    # Download single file"
+    echo "  $0 vast1 /workspace/vol_modeling/models/best.pth ./models/    # Download model checkpoint"
     exit 1
 fi
 

@@ -1,7 +1,7 @@
 # manage_instances.sh
 #!/bin/bash
 
-CONFIG_FILE="$HOME/.bam_config/ec2_aliases.json"
+CONFIG_FILE="$HOME/.vol_project_config/ec2_aliases.json"
 
 # Ensure jq is installed
 if ! command -v jq &> /dev/null; then
@@ -57,6 +57,6 @@ case "$1" in
         ;;
     *)
         echo "Usage: $0 {list|add|remove}"
-        echo "Manages EC2 instance aliases for BAM project"
+        echo "Manages EC2 instance aliases for vol_project project"
         ;;
 esac

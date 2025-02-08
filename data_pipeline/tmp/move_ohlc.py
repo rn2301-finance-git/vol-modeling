@@ -1,33 +1,38 @@
 import boto3
+import os
 
-def fix_directory_structure(bucket_name):
+def move_to_parent_directory(bucket_name):
     s3 = boto3.client('s3')
     
-    # Source and destination within same date directory
-    base_prefix = "databento/OHLCV/2025/01/15/"
+    # Source and destination prefixes
+    source_base = "databento/ITCH/2025/01/15/"
+    dest_base = "databento/ITCH/"
     
-    print(f"Moving files into data/ subdirectory in {base_prefix}")
+    print(f"Moving files from {source_base} to {dest_base}")
     
     # List files in source directory
     paginator = s3.get_paginator('list_objects_v2')
     moved = 0
     
     try:
-        for page in paginator.paginate(Bucket=bucket_name, Prefix=base_prefix):
+        for page in paginator.paginate(Bucket=bucket_name, Prefix=source_base):
             if 'Contents' not in page:
                 continue
                 
             for obj in page['Contents']:
                 src_key = obj['Key']
-                if not src_key.endswith('.dbn.zst'):  # Skip non-data files
-                    continue
+                
+                # Check if file is in data or metadata subdirectory
+                if '/data/' in src_key or '/metadata/' in src_key:
+                    # Extract the subdirectory (data or metadata) and filename
+                    parts = src_key.split('/')
+                    subdir = 'data' if '/data/' in src_key else 'metadata'
+                    filename = parts[-1]
                     
-                # Only process files that aren't already in data/
-                if '/data/' not in src_key:
-                    filename = src_key.split('/')[-1]
-                    dst_key = f"{base_prefix}data/{filename}"
+                    # Construct new key in parent directory
+                    dst_key = f"{dest_base}{subdir}/{filename}"
                     
-                    print(f"Moving {filename} to data/ subdirectory...")
+                    print(f"Moving {src_key} to {dst_key}")
                     
                     # Copy to new location
                     s3.copy_object(
@@ -40,11 +45,11 @@ def fix_directory_structure(bucket_name):
                     s3.delete_object(Bucket=bucket_name, Key=src_key)
                     moved += 1
                 
-        print(f"\nMoved {moved} files into data/ subdirectory")
+        print(f"\nMoved {moved} files to parent directory")
         
     except Exception as e:
         print(f"Error: {str(e)}")
 
 if __name__ == "__main__":
-    BUCKET_NAME = "bam-volatility-project"
-    fix_directory_structure(BUCKET_NAME)
+    BUCKET_NAME = os.environ.get('BUCKET_NAME')
+    move_to_parent_directory(BUCKET_NAME)

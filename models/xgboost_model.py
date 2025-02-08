@@ -82,6 +82,9 @@ def train_xgboost_model(
     run_manager: Optional[RunManager] = None,
     asymmetric_loss: bool = False,
     asymmetric_alpha: float = 1.5,
+    reg_alpha: float = 0.0,
+    reg_lambda: float = 1.0,
+    gamma: float = 0.0,
 ):
     """
     Train an XGBoost model.
@@ -116,6 +119,12 @@ def train_xgboost_model(
         Whether to use asymmetric loss function that penalizes under-predictions more (default False)
     asymmetric_alpha : float
         Factor to penalize under-predictions when using asymmetric loss (default 1.5)
+    reg_alpha : float
+        L1 regularization term on weights (default: 0.0)
+    reg_lambda : float 
+        L2 regularization term on weights (default: 1.0)
+    gamma : float
+        Minimum loss reduction required to make a further partition (default: 0.0)
     
     Returns
     -------
@@ -156,6 +165,9 @@ def train_xgboost_model(
     logger.info(f"asymmetric_loss: {asymmetric_loss}")
     if asymmetric_loss:
         logger.info(f"asymmetric_alpha: {asymmetric_alpha}")
+    logger.info(f"reg_alpha: {reg_alpha}")
+    logger.info(f"reg_lambda: {reg_lambda}")
+    logger.info(f"gamma: {gamma}")
     
     try:
         # 1) Log config to RunManager, if available
@@ -166,6 +178,9 @@ def train_xgboost_model(
                 'max_depth': max_depth,
                 'subsample': subsample,
                 'colsample_bytree': colsample_bytree,
+                'reg_alpha': reg_alpha,
+                'reg_lambda': reg_lambda,
+                'gamma': gamma,
                 'tree_method': "hist",
                 'device': device
             }
@@ -210,6 +225,9 @@ def train_xgboost_model(
             "max_depth": max_depth,
             "subsample": subsample,
             "colsample_bytree": colsample_bytree,
+            "reg_alpha": reg_alpha,
+            "reg_lambda": reg_lambda,
+            "gamma": gamma,
             "tree_method": "hist",
             "device": "cpu",
             "missing": np.nan,

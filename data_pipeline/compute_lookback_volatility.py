@@ -10,6 +10,8 @@ import os
 from tempfile import NamedTemporaryFile
 from feature_engineering import get_dates_from_s3
 
+BUCKET_NAME = os.environ.get('BUCKET_NAME')
+
 def date_range_list(start_str, end_str):
     """
     Return list of date strings [start_str, ..., end_str] inclusive,
@@ -25,7 +27,7 @@ def date_range_list(start_str, end_str):
         curr += timedelta(days=1)
     return out
 
-def list_prior_dates(dt_str, n=10, bucket="bam-volatility-project", prefix="data/features/itch"):
+def list_prior_dates(dt_str, n=10, bucket=BUCKET_NAME, prefix="data/features/itch"):
     """
     Return up to N available trading days before dt_str (not including dt_str), in ascending order.
     Uses actual S3 data availability rather than calendar days.
@@ -102,7 +104,7 @@ def main():
     print(f"\nComputing average intraday vol from {start_str} to {end_str} (inclusive)...")
 
     s3_fs = s3fs.S3FileSystem()
-    bucket = "bam-volatility-project"
+    bucket = BUCKET_NAME
     prefix_itch = "data/features/itch"
     prefix_out = "data/features/intraday_volatility"
 
@@ -259,4 +261,7 @@ def main():
 
 
 if __name__ == "__main__":
+    if not BUCKET_NAME:
+        print("Error: BUCKET_NAME environment variable not set")
+        sys.exit(1)
     main()

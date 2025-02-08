@@ -1,11 +1,11 @@
 import sys
 import os
-if os.path.exists("/workspace/BAM"):
-    sys.path.append("/workspace/BAM")
-elif os.path.exists("/ml_data/BAM"):
-    sys.path.append("/ml_data/BAM")
+if os.path.exists("/workspace/vol_modeling"):
+    sys.path.append("/workspace/vol_modeling")
+elif os.path.exists("/ml_data/vol_project"):
+    sys.path.append("/ml_data/vol_project")
 else:
-    raise RuntimeError("Could not find BAM project directory in expected locations")
+    raise RuntimeError("Could not find vol_project project directory in expected locations")
 import pandas as pd
 import s3fs
 from datetime import datetime
@@ -24,6 +24,9 @@ from models.xgboost_model import train_xgboost_model, evaluate_xgboost_model
 from evaluation.hyperparameter_tuning import run_experiment
 from models.lasso_model import train_lasso_model, evaluate_lasso_model
 
+BUCKET_NAME = os.environ.get('BUCKET_NAME')
+if not BUCKET_NAME:
+    raise ValueError("Environment variable BUCKET_NAME must be set")
 
 def upload_debug_dfs(datasets: Dict[str, pd.DataFrame], timestamp: str):
     """Upload dataframes to S3 for debugging."""
@@ -31,7 +34,7 @@ def upload_debug_dfs(datasets: Dict[str, pd.DataFrame], timestamp: str):
     logger.info("\nUploading dataframes for debugging...")
     
     fs = s3fs.S3FileSystem(anon=False)
-    base_path = "s3://bam-volatility-project/debug_upload_df"
+    base_path = f"s3://{BUCKET_NAME}/debug_upload_df"
     
     for split, df in datasets.items():
         file_path = f"{base_path}/{split}_df_{timestamp}.parquet"
@@ -114,7 +117,7 @@ def get_model_params(model_type: str, use_cuda: bool = False, returns_fit: bool 
             'params': {
                 'max_depth': 6,
                 'learning_rate': 0.1,
-                'n_estimators': 100,
+                'n_estimators': 300,
                 'objective': 'reg:squarederror',
                 'tree_method': 'hist',
                 'random_state': 42

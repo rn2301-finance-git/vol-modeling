@@ -3,11 +3,16 @@ import pyarrow as pa
 import pyarrow.parquet as pq
 import argparse
 from datetime import datetime
+import os
+
+BUCKET_NAME = os.environ.get('BUCKET_NAME')
+if not BUCKET_NAME:
+    raise ValueError("Environment variable BUCKET_NAME must be set")
 
 def create_topn_subset(
     date_str,
     n=10,  # New parameter for arbitrary N
-    s3_bucket='bam-volatility-project',
+    s3_bucket=BUCKET_NAME,
     input_prefix='data/features/attention_df/all/',
     output_prefix='data/features/attention_df/top_n/'
 ):
@@ -60,7 +65,7 @@ def process_date_range(start_date, end_date, n=10, overwrite=False, **kwargs):
     end_dt = datetime.strptime(end_date, "%Y%m%d")
     
     fs = s3fs.S3FileSystem(anon=False)
-    s3_bucket = kwargs.get('s3_bucket', 'bam-volatility-project')
+    s3_bucket = kwargs.get('s3_bucket', 'volatility-project')
     input_prefix = kwargs.get('input_prefix', 'data/features/attention_df/all/')
     output_prefix = kwargs.get('output_prefix', 'data/features/attention_df/top_n/')
     # List all files in the input directory

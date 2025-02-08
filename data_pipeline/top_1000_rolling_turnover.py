@@ -1,15 +1,14 @@
 import boto3
 import re
-import os
 from datetime import date, datetime
 import pandas as pd
 import databento as db
-import warnings
 import argparse
+import os
 # --------------------------------------------------------------------
 # Configuration variables (edit as needed)
 #
-S3_BUCKET = "bam-volatility-project"
+S3_BUCKET = os.environ.get('BUCKET_NAME')
 # This is where your daily OHLCV data is stored
 # e.g.: "databento/OHLCV/2025/01/15/data"
 S3_OHLCV_PREFIX = "databento/OHLCV"
@@ -24,7 +23,7 @@ S3_OUTPUT_PREFIX = "data/daily_turnover"
 def parse_date_from_key(key: str) -> date:
     """
     Extract the date from an S3 key name like:
-      'databento/OHLCV/2025/01/15/data/xnas-itch-20250115.ohlcv-1d.dbn.zst'
+      'databento/OHLCV/data/xnas-itch-20250115.ohlcv-1d.dbn.zst'
     Return a Python date (e.g. 2025-01-15).
     """
     # This regex looks for xnas-itch-YYYYMMDD.ohlcv-1d.dbn.zst
@@ -159,7 +158,7 @@ def compute_rolling_average_turnover_excluding_current_day(
                     df_ranked = df_ranked.head(top_n)
 
                 # Generate S3 key for output
-                out_key = f"s3://{s3_bucket}/{s3_output_prefix}/{day_date:%Y%m%d}_turnover.csv"
+                out_key = f"s3://{s3_bucket}/{s3_output_prefix}/{day_date:%Y%m%d}.turnover.csv"
                 df_ranked.to_csv(out_key, index=False)
                 print(f"Uploaded CSV to {out_key}")
 

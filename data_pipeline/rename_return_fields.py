@@ -99,8 +99,8 @@ def main():
                         help='Start date in YYYYMMDD format (e.g., 20240116)')
     parser.add_argument('-e', '--end-date', required=True,
                         help='End date in YYYYMMDD format (e.g., 20240131)')
-    parser.add_argument('--bucket', default='bam-volatility-project',
-                        help='S3 bucket name (default: bam-volatility-project)')
+    parser.add_argument('--bucket', default='volatility-project',
+                        help='S3 bucket name (default: volatility-project)')
     parser.add_argument('--update-all', action='store_true',
                         help='Update files in data/features/attention_df/all/')
     parser.add_argument('--update-topn', action='store_true',
