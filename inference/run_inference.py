@@ -123,8 +123,10 @@ def parse_arguments():
                         help="Name of the experiment folder (e.g. 'top10') under s3://volatility-project/experiments/<model_type>/")
     parser.add_argument("-p", "--run-prefix", type=str, required=True,
                         help="Prefix of the run folder to use (e.g. 'jennifer'). Assumed to be unique within the experiment.")
-    parser.add_argument("-d", "--date", type=str, default=None,
-                        help="(Optional) Specific date to run inference for (YYYYMMDD). If not set, run for all test dates.")
+    parser.add_argument("-s", "--start-date", type=str, default=None,
+                        help="Start date for inference (YYYYMMDD). If only start-date is provided, run for just that date.")
+    parser.add_argument("--end-date", type=str, default=None,
+                        help="End date for inference (YYYYMMDD). Must be provided with start-date.")
     parser.add_argument("--dense", action="store_true",
                         help="If set (for transformer models), override sample_every=1 to generate predictions for every minute. "
                              "If not set, predictions will be computed on sparse sequences and then forward-filled.")
@@ -382,20 +384,29 @@ def load_model(checkpoint_s3_path: str, model_type: str, run_folder: str):
 ###############################################################################
 # 4) Determine which dates to run
 ###############################################################################
-def get_dates_to_infer(single_date: Optional[str] = None):
+def get_dates_to_infer(start_date: Optional[str] = None, end_date: Optional[str] = None):
     """
     Return a list of dates (as strings YYYYMMDD) to run inference on.
-    If single_date is provided, return [single_date] only.
-    Otherwise, return NYSE trading days between 2024-08-01 and 2025-01-14.
+    If only start_date is provided, return [start_date].
+    If both start_date and end_date are provided, return all trading days between them.
+    If neither is provided, return all trading days between 2024-01-16 and 2025-01-14.
     """
-    if single_date:
-        return [single_date]
-
     from pandas_market_calendars import get_calendar
     nyse = get_calendar('NYSE')
     
-    start_date = "20240116"
-    end_date = "20250114"
+    if start_date and not end_date:
+        return [start_date]
+    
+    # Default date range if neither is provided
+    if not start_date and not end_date:
+        start_date = "20240116"
+        end_date = "20250114"
+    elif start_date and end_date:
+        # Validate that end_date is not before start_date
+        if end_date < start_date:
+            raise ValueError(f"end_date ({end_date}) cannot be before start_date ({start_date})")
+    else:
+        raise ValueError("If end_date is provided, start_date must also be provided")
     
     schedule = nyse.schedule(start_date=start_date, end_date=end_date)
     trading_days = schedule.index.strftime('%Y%m%d').tolist()
@@ -406,7 +417,7 @@ def get_dates_to_infer(single_date: Optional[str] = None):
 ###############################################################################
 def load_parquet_for_inference(date_str: str) -> pd.DataFrame:
     fs = s3fs.S3FileSystem(anon=False)
-    file_path = f"volatility-project/data/features/attention_df/all/{date_str}.parquet"
+    file_path = f"{BUCKET_NAME}/data/features/attention_df/all/{date_str}.parquet"
     
     if not fs.exists(file_path):
         logger.warning(f"File not found: s3://{file_path}")
@@ -639,17 +650,36 @@ def predict_day(
                 dmatrix = xgboost.DMatrix(X_data)
                 preds_scaled = model.predict(dmatrix)
             
-            # Invert StandardScaler if used
+           # Invert StandardScaler if used
             if target_scaler is not None:
                 preds_unscaled = target_scaler.inverse_transform(preds_scaled.reshape(-1, 1)).squeeze()
             else:
                 preds_unscaled = preds_scaled
-                
+
+            logger.info("After inverse_transform (preds_unscaled):")
+            logger.info(f"After inverse_transform - min: {preds_unscaled.min()}, max: {preds_unscaled.max()}, mean: {preds_unscaled.mean()}, median: {np.median(preds_unscaled)}")
+            # Clip unscaled 
+            preds_unscaled = np.clip(preds_unscaled, None, 3)
+            logger.info("After clipping (preds_unscaled):")
+            logger.info(f"After clipping - min: {preds_unscaled.min()}, max: {preds_unscaled.max()}, mean: {preds_unscaled.mean()}, median: {np.median(preds_unscaled)}")
+
             # Invert log1p transformation
             final_preds = np.expm1(preds_unscaled)
+
+            logger.info("After np.expm1 (final_preds) BEFORE clipping:")
+            logger.info(f"min: {final_preds.min()}, max: {final_preds.max()}")
+
+            # Clip negative predictions to 0
+            final_preds = np.clip(final_preds, 0, None)
+
+            logger.info("After clipping (final_preds):")
+            logger.info(f"min: {final_preds.min()}, max: {final_preds.max()}")
+
+            # Optionally, plot histograms at each stage
             
             pred_df = df.copy()
             pred_df["predicted.volatility"] = final_preds
+            pred_df["predicted.volatility.unscaled"] = preds_unscaled
             
             latency = time.time() - t0
             logger.info(f"XGBoost inference latency: {latency:.2f} seconds")
@@ -872,8 +902,8 @@ def process_single_date(args_tuple):
 def main():
     args = parse_arguments()
     logger.info(f"Running inference for model={args.model_type}, experiment={args.experiment_name}, "
-                f"run prefix={args.run_prefix}, date={args.date}, dense={args.dense}, "
-                f"parallel processes={args.workers}, no_overwrite={args.no_overwrite}")
+                f"run prefix={args.run_prefix}, start_date={args.start_date}, end_date={args.end_date}, "
+                f"dense={args.dense}, parallel processes={args.workers}, no_overwrite={args.no_overwrite}")
     
     # 1. Find the specific run checkpoint using the provided run prefix.
     checkpoint_path = find_checkpoint_with_run_prefix(args.model_type, args.experiment_name, args.run_prefix)
@@ -886,7 +916,7 @@ def main():
     logger.info("Model and scalers loaded successfully.")
     
     # 3. Determine which dates to run
-    dates_to_run = get_dates_to_infer(args.date)
+    dates_to_run = get_dates_to_infer(args.start_date, args.end_date)
     logger.info(f"Will process {len(dates_to_run)} dates using {args.workers} parallel processes")
     
     # Prepare arguments for parallel processing
